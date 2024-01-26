@@ -1,0 +1,45 @@
+# Borgmatic configuration file for managing backup behavior
+
+location:
+    # List of repositories where backups will be stored
+    repositories:
+        - ${BORG_REPO}  # Uses BORG_REPO variable from backup_config.sh
+
+    # Directories to include in the backup
+    source_directories:
+        - /home
+        - /etc
+        - /var
+
+storage:
+    # Encryption passphrase for securing backups
+    encryption_passphrase: "YourSecurePassphrase"  # Replace with your passphrase
+    # Naming format for the backup archives
+    archive_name_format: 'backup-{now:%Y-%m-%d_%H:%M:%S}'
+
+retention:
+    # Retention policy for pruning old backups
+    keep_within: 2d  # Keep all backups within the last 2 days
+    keep_daily: 5    # Then, keep daily backups for 5 days
+    keep_weekly: 1   # Weekly backups for 1 weeks
+    keep_monthly: 0  # Monthly backups for 0 months
+    keep_yearly: 0   # Keep 0 yearly backups
+    prefix: 'hostname-'  # Prefix for backup names
+
+consistency:
+    # Consistency checks to perform on backups
+    checks:
+        - repository  # Checks the repository for errors
+        - archives    # Verifies the archives in the repository
+
+hooks:
+    # Hooks to run custom scripts at different stages of the backup process
+    before_backup:
+        - /etc/borgmatic/pre_backup_script.sh  # Script to run before backup
+
+    after_backup:
+        - /etc/borgmatic/post_backup_script.sh  # Script to run after backup
+        - /etc/borgmatic/backup_stats_script.sh  # Script for generating backup stats
+
+    on_error:
+        - /etc/borgmatic/error_handling_script.sh  # Script to handle errors
